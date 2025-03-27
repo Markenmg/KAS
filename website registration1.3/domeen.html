@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Domeeniotsing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        .select-wrapper:hover select,
+        .selected {
+            background-color: #3b82f6;
+            color: white;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 p-6">
+    <div class="max-w-3xl mx-auto bg-white p-6 rounded-lg shadow">
+        <div class="flex items-center space-x-2">
+            <div class="font-bold text-lg">1</div>
+            <h2 class="text-xl font-semibold">Leia sobiv domeen</h2>
+        </div>
+        <p class="mt-2 text-gray-600">Sisesta domeeninimi ja kontrolli saadavust.</p>
+        <div class="mt-4 flex">
+            <input id="domainInput" type="text" placeholder="Sisesta domeeninimi" class="border p-2 flex-grow rounded-l">
+            <button onclick="checkDomain()" class="bg-blue-500 text-white px-4 rounded-r">KONTROLLI</button>
+        </div>
+        <div id="results" class="mt-6"></div>
+    </div>
+    
+    <script>
+        function checkDomain() {
+            const domain = document.getElementById('domainInput').value;
+            const results = document.getElementById('results');
+            results.innerHTML = '';
+            
+            if (!domain) {
+                results.innerHTML = '<p class="text-red-500">Palun sisesta domeeninimi!</p>';
+                return;
+            }
+            
+            const domains = [
+                { name: domain + '.ee', available: false },
+                { name: domain + '.de', available: true, price: '7 €' },
+                { name: domain + '.eu', available: true, price: '17 €' },
+                { name: domain + '.com', available: true, price: '4 €' },
+                { name: domain + '.ef', available: true, price: '23 €' },
+                { name: domain + '.se', available: true, price: '12 €' }
+            ];
+            
+            domains.forEach(d => {
+                if (d.available) {
+                    results.innerHTML += `<div class='flex justify-between items-center border p-2 mt-2 rounded' onclick='toggleSelection(this)'>
+                        <span>${d.name}</span>
+                        <span>${d.price} + km</span>
+                        <div class='select-wrapper'>
+                            <select class='border p-1 rounded'>
+                                <option value="1">1 aasta</option>
+                                <option value="2">2 aastat</option>
+                                <option value="3">3 aastat</option>
+                                <option value="4">4 aastat</option>
+                                <option value="5">5 aastat</option>
+                            </select>
+                        </div>
+                        <button class='bg-blue-500 text-white px-3 py-1 rounded'>+ Vali</button>
+                    </div>`;
+                } else {
+                    results.innerHTML += `<div class='text-red-500 mt-2'>${d.name} ei ole saadaval!</div>`;
+                }
+            });
+        }
+
+        function toggleSelection(element) {
+            element.classList.toggle('selected');
+        }
+    </script>
+</body>
+</html>
