@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="et">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Domeeniotsing Bootstrapiga</title>
+  <link
+    href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+    rel="stylesheet"
+  />
+  <style>
+    .selected {
+      background-color: #0d6efd !important; /* Bootstrap primary */
+      color: white !important;
+    }
+  </style>
+</head>
+<body class="bg-light p-4">
+  <div class="container bg-white p-4 rounded shadow-sm" style="max-width: 600px;">
+    <div class="d-flex align-items-center mb-3">
+      <div class="fw-bold fs-4 me-2">1</div>
+      <h2 class="h4 mb-0">Leia sobiv domeen</h2>
+    </div>
+    <p class="text-secondary">Sisesta domeeninimi ja kontrolli saadavust.</p>
+
+    <div class="input-group mb-3">
+      <input
+        id="domainInput"
+        type="text"
+        class="form-control"
+        placeholder="Sisesta domeeninimi"
+      />
+      <button id="checkBtn" class="btn btn-primary" type="button">KONTROLLI</button>
+    </div>
+
+    <div id="results" class="mb-4"></div>
+
+    <h3 class="h5">Valitud domeenid</h3>
+    <div
+      id="selectedDomains"
+      class="bg-light p-3 rounded border"
+      style="min-height: 50px;"
+    ></div>
+
+    <button
+      id="goToPayment"
+      class="btn btn-success mt-3"
+      disabled
+      type="button"
+    >
+      Jätka maksmisele
+    </button>
+  </div>
+
+  <script>
+    const selectedDomains = new Set();
+
+    document.getElementById("checkBtn").addEventListener("click", () => {
+      const domain = document.getElementById("domainInput").value.trim();
+      const results = document.getElementById("results");
+      results.innerHTML = "";
+
+      if (!domain) {
+        results.innerHTML =
+          '<div class="text-danger">Palun sisesta domeeninimi!</div>';
+        return;
+      }
+
+      const domains = [
+        { name: domain + ".ee", available: false },
+        { name: domain + ".de", available: true, price: 7 },
+        { name: domain + ".eu", available: true, price: 17 },
+        { name: domain + ".com", available: true, price: 4 },
+        { name: domain + ".net", available: true, price: 12 },
+      ];
+
+      domains.forEach((d) => {
+        if (d.available) {
+          const div = document.createElement("div");
+          div.className =
+            "d-flex justify-content-between align-items-center border rounded p-2 mt-2";
+          div.innerHTML = `
+            <span>${d.name}</span>
+            <span>${d.price} € + km</span>
+            <button type="button" class="btn btn-sm btn-primary">+ Lisa</button>
+          `;
+
+          if (selectedDomains.has(d.name)) {
+            const btn = div.querySelector("button");
+            btn.textContent = "Valitud";
+            btn.disabled = true;
+            div.classList.add("selected");
+          }
+
+          div.querySelector("button").addEventListener("click", (e) => {
+            e.stopPropagation();
+            addDomain(d.name, d.price, div);
+          });
+
+          results.appendChild(div);
+        } else {
+          const naDiv = document.createElement("div");
+          naDiv.className = "text-danger mt-2";
+          naDiv.textContent = `${d.name} ei ole saadaval!`;
+          results.appendChild(naDiv);
+        }
+      });
+    });
+
+    function addDomain(name, price, containerDiv) {
+      if (selectedDomains.has(name)) return;
+      selectedDomains.add({ name, price });
+      renderSelected();
+      containerDiv.classList.add("selected");
+      const btn = containerDiv.querySelector("button");
+      btn.textContent = "Valitud";
+      btn.disabled = true;
+      updatePaymentButton();
+    }
+
+    function renderSelected() {
+      const container = document.getElementById("selectedDomains");
+      container.innerHTML = "";
+
+      selectedDomains.forEach((domainObj) => {
+        const div = document.createElement("div");
+        div.className =
+          "d-flex justify-content-between align-items-center bg-white rounded p-2 shadow-sm mb-2";
+
+        div.textContent = `${domainObj.name} — ${domainObj.price} €`;
+
+        const btn = document.createElement("button");
+        btn.className = "btn btn-sm btn-danger ms-3";
+        btn.textContent = "Eemalda";
+        btn.onclick = () => {
+          selectedDomains.delete(domainObj);
+          renderSelected();
+          // Re-enable button in results
+          const results = document.getElementById("results");
+          Array.from(results.children).forEach((div) => {
+            if (div.textContent.includes(domainObj.name)) {
+              const btn = div.querySelector("button");
+              btn.textContent = "+ Lisa";
+              btn.disabled = false;
+              div.classList.remove("selected");
+            }
+          });
+          updatePaymentButton();
+        };
+
+        div.appendChild(btn);
+        container.appendChild(div);
+      });
+    }
+
+    function updatePaymentButton() {
+      const btn = document.getElementById("goToPayment");
+      btn.disabled = selectedDomains.size === 0;
+    }
+
+    // Because Set uses reference to object, for easier tracking, let's switch to an array
+    // Replace selectedDomains Set with an array instead for easier manipulation:
+
+  </script>
+
+  <script>
+    // Fixing the Set of objects issue by changing to an array instead:
+
+    let selectedDomainsArray = [];
+
+    document.getElementById("checkBtn").addEventListener("click", () => {
+      const domain = document.getElementById("domainInput").value.trim();
+      const results = document.getElementById("results");
+      results.innerHTML = "";
+
+      if (!domain) {
+        results.innerHTML =
+          '<div class="text-danger">Palun sisesta domeeninimi!</div>';
+        return;
+      }
+
+      const domains = [
+        { name: domain + ".ee", available: false },
+        { name: domain + ".de", available: true, price: 7 },
+        { name: domain + ".eu", available: true, price: 17 },
+        { name: domain + ".com", available: true, price: 4 },
+        { name: domain + ".net", available: true, price: 12 },
+      ];
+
+      domains.forEach((d) => {
+        if (d.available) {
+          const div = document.createElement("div");
+          div.className =
+            "d-flex justify-content-between align-items-center border rounded p-2 mt-2";
+          div.innerHTML = `
+            <span>${d.name}</span>
+            <span>${d.price} € + km</span>
+            <button type="button" class="btn btn-sm btn-primary">+ Lisa</button>
+          `;
+
+          if (selectedDomainsArray.find((x) => x.name === d.name)) {
+            const btn = div.querySelector("button");
+            btn.textContent = "Valitud";
+            btn.disabled = true;
+            div.classList.add("selected");
+          }
+
+          div.querySelector("button").addEventListener("click", (e) => {
+            e.stopPropagation();
+            addDomain(d.name, d.price, div);
+          });
+
+          results.appendChild(div);
+        } else {
+          const naDiv = document.createElement("div");
+          naDiv.className = "text-danger mt-2";
+          naDiv.textContent = `${d.name} ei ole saadaval!`;
+          results.appendChild(naDiv);
+        }
+      });
+    });
+
+    function addDomain(name, price, containerDiv) {
+      if (selectedDomainsArray.find((x) => x.name === name)) return;
+      selectedDomainsArray.push({ name, price });
+      renderSelected();
+      containerDiv.classList.add("selected");
+      const btn = containerDiv.querySelector("button");
+      btn.textContent = "Valitud";
+      btn.disabled = true;
+      updatePaymentButton();
+    }
+
+    function renderSelected() {
+      const container = document.getElementById("selectedDomains");
+      container.innerHTML = "";
+
+      selectedDomainsArray.forEach((domainObj) => {
+        const div = document.createElement("div");
+        div.className =
+          "d-flex justify-content-between align-items-center bg-white rounded p-2 shadow-sm mb-2";
+
+        div.textContent = `${domainObj.name} — ${domainObj.price} €`;
+
+        const btn = document.createElement("button");
+        btn.className = "btn btn-sm btn-danger ms-3";
+        btn.textContent = "Eemalda";
+        btn.onclick = () => {
+          selectedDomainsArray = selectedDomainsArray.filter(
+            (x) => x.name !== domainObj.name
+          );
+          renderSelected();
+          // Re-enable button in results
+          const results = document.getElementById("results");
+          Array.from(results.children).forEach((div) => {
+            if (div.textContent.includes(domainObj.name)) {
+              const btn = div.querySelector("button");
+              btn.textContent = "+ Lisa";
+              btn.disabled = false;
+              div.classList.remove("selected");
+            }
+          });
+          updatePaymentButton();
+        };
+
+        div.appendChild(btn);
+        container.appendChild(div);
+      });
+    }
+
+    function updatePaymentButton() {
+      const btn = document.getElementById("goToPayment");
+      btn.disabled = selectedDomainsArray.length === 0;
+    }
+
+    document.getElementById("goToPayment").addEventListener("click", () => {
+      // Save selected domains to sessionStorage and go to payment page
+      sessionStorage.setItem(
+        "selectedDomains",
+        JSON.stringify(selectedDomainsArray)
+      );
+      window.location.href = "payment.html";
+    });
+  </script>
+
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
