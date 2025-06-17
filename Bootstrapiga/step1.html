@@ -24,8 +24,12 @@
     </div>
 
     <div id="results" class="mb-4"></div>
+
     <h5>Valitud domeen</h5>
-    <div id="selectedDomain" class="p-3 border rounded text-muted">Ühte domeeni saab valida korraga</div>
+    <div id="selectedDomain" >
+
+    </div>
+
     <button id="goToStep2" class="btn btn-success mt-3" disabled>Jätka andmetega</button>
   </div>
 
@@ -36,7 +40,14 @@
       const name = document.getElementById("domainInput").value.trim();
       const results = document.getElementById("results");
       results.innerHTML = "";
-      if (!name) return results.innerHTML = '<div class="text-danger">Palun sisesta domeeninimi.</div>';
+      selectedDomain = null;
+      document.getElementById("selectedDomain").innerText = "Domeen pole valitud";
+      document.getElementById("goToStep2").disabled = true;
+
+      if (!name) {
+        results.innerHTML = '<div class="text-danger">Palun sisesta domeeninimi.</div>';
+        return;
+      }
 
       const domains = [
         { name: name + ".com", available: true, price: 10 },
@@ -67,6 +78,7 @@
     });
 
     document.getElementById("goToStep2").addEventListener("click", () => {
+      if (!selectedDomain) return;
       sessionStorage.setItem("selectedDomain", JSON.stringify(selectedDomain));
       window.location.href = "step2.html";
     });

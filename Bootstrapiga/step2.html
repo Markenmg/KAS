@@ -6,7 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>2. Sisesta andmed</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
-  <style>.step-indicator span.active { font-weight: bold; color: #0d6efd; }</style>
+  <style>
+    .step-indicator span.active {
+      font-weight: bold;
+      color: #0d6efd;
+    }
+  </style>
 </head>
 <body class="bg-light p-4">
   <div class="container bg-white p-4 rounded shadow-sm" style="max-width: 600px;">
@@ -15,7 +20,23 @@
     </div>
 
     <h2>Kontaktandmed</h2>
+
+    <div id="selectedDomain" class="p-3 border rounded text-muted mb-3">
+      Ühte domeeni saab valida korraga
+    </div>
+
+    <p><strong>Tellitud toode/domeen:</strong> <span id="selectedProduct"></span></p>
+    <p><strong>Hind (€):</strong> <span id="selectedPrice"></span></p>
+
     <form id="infoForm" novalidate>
+      <div class="mb-3">
+        <label for="firstName" class="form-label">Eesnimi</label>
+        <input type="text" class="form-control" id="firstName" required />
+      </div>
+      <div class="mb-3">
+        <label for="lastName" class="form-label">Perekonnanimi</label>
+        <input type="text" class="form-control" id="lastName" required />
+      </div>
       <div class="mb-3">
         <label for="email" class="form-label">E-post</label>
         <input type="email" class="form-control" id="email" required />
@@ -29,17 +50,41 @@
   </div>
 
   <script>
+    // Retrieve selected domain object from step1 (saved as "selectedDomain")
+    const selectedDomain = JSON.parse(sessionStorage.getItem("selectedDomain"));
+
+    if (selectedDomain) {
+      document.getElementById("selectedProduct").textContent = selectedDomain.name;
+      document.getElementById("selectedPrice").textContent = selectedDomain.price + " €";
+    } else {
+      document.getElementById("selectedProduct").textContent = "Pole valitud";
+      document.getElementById("selectedPrice").textContent = "-";
+    }
+
     document.getElementById("infoForm").addEventListener("submit", function(e) {
       e.preventDefault();
-      const email = document.getElementById("email").value;
-      const phone = document.getElementById("phone").value;
 
-      if (!email || !phone) {
+      const firstName = document.getElementById("firstName").value.trim();
+      const lastName = document.getElementById("lastName").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const phone = document.getElementById("phone").value.trim();
+
+      if (!firstName || !lastName || !email || !phone) {
         alert("Palun täida kõik väljad.");
         return;
       }
 
-      sessionStorage.setItem("userInfo", JSON.stringify({ email, phone }));
+      // Save all user info + order details to sessionStorage
+      sessionStorage.setItem("userInfo", JSON.stringify({
+        firstName,
+        lastName,
+        email,
+        phone,
+        product: selectedDomain ? selectedDomain.name : null,
+        price: selectedDomain ? selectedDomain.price : null
+      }));
+
+      // Go to next step
       window.location.href = "step3.html";
     });
   </script>
